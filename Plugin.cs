@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BoplFixedMath;
 using HarmonyLib;
 using System.Reflection;
@@ -31,7 +31,7 @@ namespace AbilityApi.Internal
         public static Sprite testSprite;
         public static List<Texture2D> BackroundSprites = new();
         public static bool hasDied = false;
-        private void Awake()
+        public void Start()
         {
             Logger.LogInfo("Plugin AbilityApi is loaded!");
 
