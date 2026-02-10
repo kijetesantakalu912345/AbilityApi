@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ namespace AbilityApi
 {
     internal class Scroller
     {
-        [HarmonyPatch(typeof(AbilityGrid), "Awake")]
+        [HarmonyPatch(typeof(AbilityGrid), nameof(AbilityGrid.Awake))]
         public static class AbilityGridPatch
         {
             public static void Postfix(AbilityGrid __instance)

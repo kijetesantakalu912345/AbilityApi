@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using Ability_Api;
 using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using BepInEx.Logging;
 
 namespace AbilityApi.Internal
 {
@@ -23,15 +24,15 @@ namespace AbilityApi.Internal
             public Sprite sprite;
             public Vector4 center;
         }
-        public static int defaultAbilityCount = 30;
+        public static int defaultAbilityCount = 31;
         public static Vector4 defaultExtents = new(0.04882813f, 0.04882813f, 0.08300781f, 0.9287109f);
         public static string directoryToModFolder = "";
-        public static GunAbility testAbilityPrefab;
+        public static InstantTestAbility testAbilityPrefab;
         public static Texture2D testAbilityTex;
         public static Sprite testSprite;
         public static List<Texture2D> BackroundSprites = new();
         public static bool hasDied = false;
-        public void Start()
+        public void Awake()
         {
             Logger.LogInfo("Plugin AbilityApi is loaded!");
 
@@ -55,9 +56,10 @@ namespace AbilityApi.Internal
             //dont use the same name multiple times or it will break stuff
             NamedSprite test = new NamedSprite("A Custom Ability", testSprite, testAbilityPrefab.gameObject, true);
             Api.RegisterNamedSprites(test, true);*/
-            //GunAbilityTest gun = new GunAbilityTest();
-            //gun.SetUpGun();
+        }
 
+        public void Start()
+        {
             GameObject[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[];
             GameObject[] array2 = array;
 
@@ -72,7 +74,8 @@ namespace AbilityApi.Internal
             Component component = BowObject.GetComponent(typeof(BowTransform));
             BowTransform obj = (BowTransform)(object)((component is BowTransform) ? component : null);
             Arrow = (BoplBody)AccessTools.Field(typeof(BowTransform), "Arrow").GetValue(obj);
-
+            GunAbilityTest gun = new GunAbilityTest();
+            gun.SetUpGun();
         }
 
 
@@ -119,7 +122,6 @@ namespace AbilityApi.Internal
                     Debug.Log("adding");
                     __instance.abilityIcons.sprites.AddRange(Sprites);
                 }
-
             }
         }
         [HarmonyPatch(typeof(AchievementHandler), "Awake")]
@@ -140,6 +142,7 @@ namespace AbilityApi.Internal
             public static void Prefix(CharacterStatsList __instance)
             {
                 //add the sprites if they havent already been added (all mods should add there abilitys on awake)
+                // ^ update from kijetesantakalu: NOT ANYMORE! trying to create your ability in awake now just won't work because unity will destroy the game object!
                 if (__instance.abilityIcons.sprites.Count == defaultAbilityCount)
                 {
                     __instance.abilityIcons.sprites.AddRange(Sprites);
@@ -159,18 +162,35 @@ namespace AbilityApi.Internal
                 }
             }
         }
-        [HarmonyPatch(typeof(MidGameAbilitySelect), "Awake")]
+        [HarmonyPatch(typeof(MidGameAbilitySelect))]
         public static class MidGameAbilitySelectPatch
         {
+            [HarmonyPostfix]
+            [HarmonyPatch(nameof(MidGameAbilitySelect.Awake))]
             public static void Postfix(MidGameAbilitySelect __instance, ref NamedSpriteList ___localAbilityIcons)
             {
                 //add the sprites
                 if (__instance.AbilityIcons.sprites.Count == defaultAbilityCount)
                 {
                     __instance.AbilityIcons.sprites.AddRange(Sprites);
-                    ___localAbilityIcons.sprites.AddRange(Sprites);
+                    Debug.Log("adding: AbilityIcons");
                 }
-
+                if (___localAbilityIcons == null || (___localAbilityIcons != null && ___localAbilityIcons.sprites.Count == defaultAbilityCount))
+                {
+                    if (___localAbilityIcons == null)
+                    {
+                        ___localAbilityIcons = (SteamManager.instance.dlc.HasDLC() ? __instance.AbilityIcons : __instance.AbilityIcons_demo);
+                    }
+                    else
+                    {
+                        ___localAbilityIcons.sprites.AddRange(Sprites);
+                    }
+                    Debug.Log("adding: ___localAbilityIcons");
+                }
+                for (int i = 0; i < ___localAbilityIcons.sprites.Count; i++)
+                {
+                    Debug.Log(___localAbilityIcons.sprites[i].name);
+                }
             }
         }
         [HarmonyPatch(typeof(RandomAbility), "Awake")]
@@ -633,26 +653,26 @@ namespace AbilityApi.Internal
             }
         }
     }
-    //public class GunAbilityTest : Gun
-    //{
-        //public override string abilityName => "Gun";
+    public class GunAbilityTest : Gun
+    {
+        public override string abilityName => "Gun";
 
-        //public override string namespaceName => "Ability_Api";
+        public override string namespaceName => "Ability_Api";
 
-        //public override string playerInAbilitySpriteName => "gun.png";
+        public override string playerInAbilitySpriteName => "gun.png";
 
-        //public override string abilityIconSpriteName => "AbilityIcon.png";
+        public override string abilityIconSpriteName => "AbilityIcon.png";
 
-        //public override string bulletSpriteName => "bullet.png";
+        public override string bulletSpriteName => "bullet.png";
 
-        //public override Fix cooldown => (Fix)10;
+        public override Fix cooldown => (Fix)0.1;
 
-        //public override float bulletSpeed => 55;
+        public override float bulletSpeed => 55; // wait shouldn't these all be `Fix`es?
 
-        //public override float bulletGravity => 3;
+        public override float bulletGravity => 3;
 
-        //public override string shootSoundEffect => "explosion";
+        public override string shootSoundEffect => "explosion";
 
-        //public override float scale => 1.5f;
-    //}
+        public override float scale => 1.5f;
+    }
 }

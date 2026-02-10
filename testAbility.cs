@@ -1,4 +1,4 @@
-﻿using BoplFixedMath;
+using BoplFixedMath;
 using System;
 using System.Collections.Generic;
 using System.Linq;

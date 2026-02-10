@@ -1,4 +1,4 @@
-﻿using AbilityApi.Internal;
+using AbilityApi.Internal;
 using BoplFixedMath;
 using System;
 using System.Collections.Generic;
@@ -70,7 +70,20 @@ namespace AbilityApi
                 Vec2 v = player.AimVector();
                 if (Vec2.Magnitude(v) > (Fix)0.4 && !this.releasedButton && !hasFired)
                 {
-                    Vec2 newV = new Vec2((Fix)1 / v.x, -(Fix)1 / v.y);
+                    Vec2 newV = new Vec2((Fix)1 / v.x, -(Fix)1 / v.y); // ... what? also this can very easily produce divsion by 0 errors...
+                    // divsion by 0 errors don't seem to break anything here but still.
+                    // the game doesn't do any of the image flipping stuff that this code does anyway...
+                    /*Fix newV_x = Fix.Zero;
+                    Fix newV_y = Fix.Zero;
+                    if (v.x != Fix.Zero)
+                    {
+                        newV_x = ((Fix)1 / v.x);
+                    }
+                    if (v.y != Fix.Zero)
+                    {
+                        newV_y = (-(Fix)1 / v.y);
+                    }
+                    Vec2 newV = new Vec2(newV_x, newV_y);*/
                     this.inputVector = Vec2.Normalized(newV);
                     //float rotation = (float)(Math.Atan2((float)inputVector.y, (float)inputVector.x) / (2 * Math.PI));
                     //Debug.Log(rotation);
