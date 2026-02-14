@@ -32,6 +32,7 @@ namespace AbilityApi.Internal
         public static Sprite testSprite;
         public static List<Texture2D> BackroundSprites = new();
         public static bool hasDied = false;
+        public static bool hasDoneNullAbilityAssociatedGameObjectCheck = false;
         public void Awake()
         {
             Logger.LogInfo("Plugin AbilityApi is loaded!");
@@ -49,13 +50,6 @@ namespace AbilityApi.Internal
             BackroundSprites.Add(LoadImageFromResources("Ability_Api", "OrangeTeam.png"));
             BackroundSprites.Add(LoadImageFromResources("Ability_Api", "GreenTeam.png"));
             BackroundSprites.Add(LoadImageFromResources("Ability_Api", "PinkTeam.png"));
-            // This name will automaticly be renamed to whatever the ability name is. 
-            /*testAbilityPrefab = Api.ConstructInstantAbility<InstantTestAbility>("A Ability");
-            testAbilityTex = Api.LoadImage(Path.Combine(directoryToModFolder, "BlinkTest.png"));
-            testSprite = Sprite.Create(testAbilityTex, new Rect(0f, 0f, testAbilityTex.width, testAbilityTex.height), new Vector2(0.5f, 0.5f));
-            //dont use the same name multiple times or it will break stuff
-            NamedSprite test = new NamedSprite("A Custom Ability", testSprite, testAbilityPrefab.gameObject, true);
-            Api.RegisterNamedSprites(test, true);*/
         }
 
         public void Start()
@@ -74,8 +68,39 @@ namespace AbilityApi.Internal
             Component component = BowObject.GetComponent(typeof(BowTransform));
             BowTransform obj = (BowTransform)(object)((component is BowTransform) ? component : null);
             Arrow = (BoplBody)AccessTools.Field(typeof(BowTransform), "Arrow").GetValue(obj);
-            GunAbilityTest gun = new GunAbilityTest();
-            gun.SetUpGun();
+            //GunAbilityTest gun = new GunAbilityTest();
+            //gun.SetUpGun();
+            // test ability stuff:
+            // This name will automaticly be renamed to whatever the ability name is. 
+            testAbilityPrefab = Api.ConstructInstantAbility<InstantTestAbility>("A Ability");
+            testAbilityTex = Api.LoadImage(Path.Combine(directoryToModFolder, "BlinkTest.png"));
+            testSprite = Sprite.Create(testAbilityTex, new Rect(0f, 0f, testAbilityTex.width, testAbilityTex.height), new Vector2(0.5f, 0.5f));
+            //dont use the same name multiple times or it will break stuff
+            NamedSprite test = new NamedSprite("A Custom Ability", testSprite, testAbilityPrefab.gameObject, true);
+            Api.RegisterNamedSprites(test, true);
+        }
+
+        public void Update()
+        {
+            if (!hasDoneNullAbilityAssociatedGameObjectCheck)
+            {
+                bool success = true;
+                for (int x = 0; x < Sprites.Count; x++)
+                {
+                    if (Sprites[x].associatedGameObject == null)
+                    {
+                        Debug.LogError("Ability \"" + Sprites[x].name + "\" has a null associatedGameObject. Make sure any custom abilities are being created in `Start()` and" +
+                            " not `Awake()`.");
+                        success = false;
+                    }
+                }
+                hasDoneNullAbilityAssociatedGameObjectCheck = true;
+                if (!success)
+                {
+                    throw new System.Exception("One or more custom abilities has a null associatedGameObject. Make sure custom abilities are created in `Start()` instead of" +
+                        " `Awake()`.");
+                }
+            }
         }
 
 
@@ -143,6 +168,7 @@ namespace AbilityApi.Internal
             {
                 //add the sprites if they havent already been added (all mods should add there abilitys on awake)
                 // ^ update from kijetesantakalu: NOT ANYMORE! trying to create your ability in awake now just won't work because unity will destroy the game object!
+                // you need to call it from Start()!
                 if (__instance.abilityIcons.sprites.Count == defaultAbilityCount)
                 {
                     __instance.abilityIcons.sprites.AddRange(Sprites);
@@ -186,10 +212,6 @@ namespace AbilityApi.Internal
                         ___localAbilityIcons.sprites.AddRange(Sprites);
                     }
                     Debug.Log("adding: ___localAbilityIcons");
-                }
-                for (int i = 0; i < ___localAbilityIcons.sprites.Count; i++)
-                {
-                    Debug.Log(___localAbilityIcons.sprites[i].name);
                 }
             }
         }
@@ -576,6 +598,7 @@ namespace AbilityApi.Internal
 
                     int num = 1;
                     NamedSpriteList abilityIcons = SteamManager.instance.abilityIcons;
+
                     for (int i = 0; i < __instance.characterSelectBoxes.Length; i++)
                     {
                         if (__instance.characterSelectBoxes[i].menuState == CharSelectMenu.ready)
@@ -653,7 +676,7 @@ namespace AbilityApi.Internal
             }
         }
     }
-    public class GunAbilityTest : Gun
+/*    public class GunAbilityTest : Gun
     {
         public override string abilityName => "Gun";
 
@@ -674,5 +697,5 @@ namespace AbilityApi.Internal
         public override string shootSoundEffect => "explosion";
 
         public override float scale => 1.5f;
-    }
+    }*/
 }

@@ -1,4 +1,7 @@
-﻿using AbilityApi;
+// see my comment in `GunAbility.cs`
+
+/*
+using AbilityApi;
 using AbilityApi.Internal;
 using System;
 using System.Collections.Generic;
@@ -32,3 +35,4 @@ namespace Ability_Api
         }
     }
 }
+*/

@@ -1,3 +1,9 @@
+// according to diggity who made this part of the mod, this can just be removed because it's broken.
+// I, kijetesantakalu, a new contributor trying to get it working with bopl 2.5.1 in 2026, honestly don't want to spend more time on this script and no gun ability mods ever came
+// out anyway, so i can safely just remove it.
+// I could be wrong on this but from what i have read it looks like it might be easier to just use ability api + the game's existing IGun and GunTransform anyway than deal with
+// the stuff in this script like scale changes throwing a NotImplementedException and whatever else was apparently broken.
+/*
 using AbilityApi.Internal;
 using BoplFixedMath;
 using System;
@@ -73,17 +79,18 @@ namespace AbilityApi
                     Vec2 newV = new Vec2((Fix)1 / v.x, -(Fix)1 / v.y); // ... what? also this can very easily produce divsion by 0 errors...
                     // divsion by 0 errors don't seem to break anything here but still.
                     // the game doesn't do any of the image flipping stuff that this code does anyway...
-                    /*Fix newV_x = Fix.Zero;
-                    Fix newV_y = Fix.Zero;
-                    if (v.x != Fix.Zero)
-                    {
-                        newV_x = ((Fix)1 / v.x);
-                    }
-                    if (v.y != Fix.Zero)
-                    {
-                        newV_y = (-(Fix)1 / v.y);
-                    }
-                    Vec2 newV = new Vec2(newV_x, newV_y);*/
+                    // produces the wrong result: 
+                    //Fix newV_x = Fix.Zero;
+                    //Fix newV_y = Fix.Zero;
+                    //if (v.x != Fix.Zero)
+                    //{
+                    //    newV_x = ((Fix)1 / v.x);
+                    //}
+                    //if (v.y != Fix.Zero)
+                    //{
+                    //    newV_y = (-(Fix)1 / v.y);
+                    //}
+                    //Vec2 newV = new Vec2(newV_x, newV_y);
                     this.inputVector = Vec2.Normalized(newV);
                     //float rotation = (float)(Math.Atan2((float)inputVector.y, (float)inputVector.x) / (2 * Math.PI));
                     //Debug.Log(rotation);
@@ -322,3 +329,4 @@ namespace AbilityApi
 
     }
 }
+*/

@@ -83,7 +83,8 @@ namespace AbilityApi
 
             return (T)updatable;
         }
-        public static T ConstructGun<T>(string name, string namespaceName, string playerSpriteFileName, string bulletFileName, Fix cooldown, float bulletSpeed, float bulletGravity, string shootSoundEffect, float scale) where T : MonoUpdatable
+        // see my comment in `GunAbility.cs`
+        /*public static T ConstructGun<T>(string name, string namespaceName, string playerSpriteFileName, string bulletFileName, Fix cooldown, float bulletSpeed, float bulletGravity, string shootSoundEffect, float scale) where T : MonoUpdatable
         {
             GameObject parent = new GameObject(name);
             GameObject.DontDestroyOnLoad(parent);
@@ -120,7 +121,7 @@ namespace AbilityApi
             gunCode.shootSoundEffect = shootSoundEffect;
 
             return (T)updatable;
-        }
+        }*/
 
         // Loads an image from the provided path and returns it as a Texture2D.
         public static Texture2D LoadImage(string path)
